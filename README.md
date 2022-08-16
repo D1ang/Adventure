@@ -1,4 +1,4 @@
-# Busters
+# Adventure
 **A Python based arcade game**
 
 
