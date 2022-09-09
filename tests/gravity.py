@@ -1,10 +1,10 @@
 import pygame
 import sys
 from pygame.locals import *
-from settings import *
-from level import Level
 
 pygame.init()
+screen_width = 1280
+screen_height = 720
 screen = pygame.display.set_mode((screen_width, screen_height))
 vec = pygame.math.Vector2
 
@@ -18,8 +18,6 @@ fps_clock = pygame.time.Clock()
 
 display_surface = pygame.display.set_mode((screen_width, screen_height))
 pygame.display.set_caption("Busters")
-
-level = Level(level_map, screen)
 
 """
 Pygame classes
@@ -90,7 +88,7 @@ sprites.add(player1, ground)
 
 grounds = pygame.sprite.Group()
 grounds.add(ground)
-""
+
 """
 The game loop that runs
 the actual game
@@ -108,7 +106,6 @@ while True:
 
     display_surface.fill((0,0,0))
     screen.fill('black')
-    level.run()
     player1.update()
 
     for sprite in sprites:
