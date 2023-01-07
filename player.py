@@ -1,5 +1,11 @@
 import pygame
+from pygame.locals import *  # noqa
 from support import import_folder
+
+# Gravity movements
+vec = pygame.math.Vector2
+acceleration = 0.5
+friction = -0.10
 
 
 class Player(pygame.sprite.Sprite):
@@ -12,7 +18,12 @@ class Player(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(topleft=position)
 
         # player moves
-        self.direction = pygame.math.Vector2(0, 0)
+        self.direction = vec(0, 0)
+
+        self.position = vec((100, 600))
+        self.velocity = vec(0, 0)
+        self.acceleration = vec(0, 0)
+
         self.movement_speed = 8
         self.gravity = 0.8
         self.jump_speed = -16
@@ -51,32 +62,48 @@ class Player(pygame.sprite.Sprite):
 
         # set the rect
         if self.on_ground and self.on_right:
-            self.rect = self.image.get_rect(bottomright = self.rect.bottomright)
+            self.rect = self.image.get_rect(bottomright=self.rect.bottomright)
         elif self.on_ground and self.on_left:
-            self.rect = self.image.get_rect(bottomleft = self.rect.bottomleft)
+            self.rect = self.image.get_rect(bottomleft=self.rect.bottomleft)
         elif self.on_ground:
-            self.rect = self.image.get_rect(midbottom = self.rect.midbottom)
+            self.rect = self.image.get_rect(midbottom=self.rect.midbottom)
 
         elif self.on_ceiling and self.on_right:
-            self.rect = self.image.get_rect(topright = self.rect.topright)
+            self.rect = self.image.get_rect(topright=self.rect.topright)
         elif self.on_ceiling and self.on_left:
-            self.rect = self.image.get_rect(topleft = self.rect.topleft)
+            self.rect = self.image.get_rect(topleft=self.rect.topleft)
         elif self.on_ceiling:
-            self.rect = self.image.get_rect(midtop = self.rect.midtop)
+            self.rect = self.image.get_rect(midtop=self.rect.midtop)
 
     def get_input(self):
-        keys = pygame.key.get_pressed()
+        # 0,5 adds vertical force a.k.a gravity
+        self.acceleration = vec(0, 0.5)
 
-        if keys[pygame.K_RIGHT]:
-            self.direction.x = 1
-            self.facing_right = True
-        elif keys[pygame.K_LEFT]:
+        pressed_keys = pygame.key.get_pressed()
+
+        if pressed_keys[pygame.K_LEFT]:
             self.direction.x = -1
             self.facing_right = False
+        elif pressed_keys[pygame.K_RIGHT]:
+            self.direction.x = 1
+            self.facing_right = True
         else:
             self.direction.x = 0
 
-        if keys[pygame.K_SPACE] and self.on_ground:
+        # if pressed_keys[K_LEFT]:
+        #     self.acceleration.x = -acceleration
+        #     self.facing_right = False
+        #     print('Left key pressed')
+        # if pressed_keys[K_RIGHT]:
+        #     self.acceleration.x = acceleration
+        #     self.facing_right = True
+        #     print('Right key pressed')
+
+        self.acceleration.x += self.velocity.x * friction
+        self.velocity += self.acceleration
+        self.position += self.velocity + 0.5 * self.acceleration
+
+        if pressed_keys[pygame.K_SPACE] and self.on_ground:
             self.jump()
 
     def get_status(self):
